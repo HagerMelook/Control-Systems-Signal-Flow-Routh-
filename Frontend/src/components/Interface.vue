@@ -17,18 +17,13 @@ export default {
   data(){
     return{
       nodes : [],
-      nodeID : 0,
-      nodeXY :[50,50],
+      nodeXY :[200,200],
     }
   },
 
   methods:{
     
-    initialize(){
-      this.nodeID=0;
-      this.nodeXY=[50,50];
-      this.nodes=[];
-    },
+
 
     generateStates(){
       let numberOfNodes = this.$refs.statesNumber.value;
@@ -36,31 +31,28 @@ export default {
       //send nodes to backend
 
       this.initialize();
-      for (let i in numberOfNodes){
+      for (let i=0;i<numberOfNodes;i++){
         let t;
         let c= new Konva.Circle({
-          radius : 5,
-          x : this.nodeXY[0]=this.nodeXY[0]+50,
-          y : this.nodeXY[1]=this.nodeXY[1]+50,
-          id: this.nodeID++,
+          radius : 15,
+          id: i,
           fill:"black",
         });
 
-        if (this.nodeID==1||this.nodeID==numberOfNodes+1){
+        if (i==0||i==numberOfNodes-1){
           c.fill("white");
           c.stroke("black");
           t=new Konva.Text({
-            fontSize: 3,
+            fontSize: 15,
             fontFamily: 'Calibri',
-            width: 10,
+            width: 25,
             align: 'center',
+            x: c.x()-13,
+            y: this.nodeXY[1]-56,
           });
-          if(this.nodeID==1) t.text("C(S)");
+          if(i==0) t.text("C(S)");
           else t.text("R(S)"); 
           this.nodes[i]= new Konva.Group({
-            x : this.nodeXY[0]=this.nodeXY[0]+50,
-            y : this.nodeXY[1]=this.nodeXY[1]+50,
-            draggable : true,
           });
           this.nodes[i].add(c);
           this.nodes[i].add(t);
@@ -68,9 +60,19 @@ export default {
         else{
           this.nodes[i]=c;
         }
+        this.nodes[i].x(this.nodeXY[0]=this.nodeXY[0]+50),
+        this.nodes[i].y(this.nodeXY[1]),
+        this.nodes[i].draggable(true),
+        this.nodes[i].id(i),
+        this.layer.add(this.nodes[i]);
       }
     },
 
+    initialize(){
+      this.layer.destroyChildren().batchDraw()
+      this.nodeXY=[50,50];
+      this.nodes=[];
+    },
 
   },
 
