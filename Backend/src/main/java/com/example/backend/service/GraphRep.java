@@ -1,5 +1,5 @@
 
-package com.lab1.signalflow.Services;
+package com.example.backend.service;
 
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ class Node{
 }
 
 public class GraphRep {
-            public static void main(String[] args) {
+    public static void main(String[] args) {
             int start_index=0;
             int dest_index=4;
             ArrayList<Node>graph=new ArrayList<>();
@@ -128,14 +128,14 @@ public class GraphRep {
         }
         System.out.println(path_delta);
 
-    double overall_T_F=0;
-    for(int i = 0;i<forward_paths.size();i++){
-        overall_T_F+=signalFlow.path_gain.get(i)*path_delta.get(i);
-    }
-    overall_T_F/=delta;
+        double overall_T_F=0;
+        for(int i = 0;i<forward_paths.size();i++){
+            overall_T_F+=signalFlow.path_gain.get(i)*path_delta.get(i);
+        }
+        overall_T_F/=delta;
 
-    System.out.println(overall_T_F);
-}
+        System.out.println(overall_T_F);
+    }
 }
 
 
