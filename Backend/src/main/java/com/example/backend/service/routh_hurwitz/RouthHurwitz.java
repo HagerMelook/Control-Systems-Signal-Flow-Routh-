@@ -1,5 +1,6 @@
-package com.example.backend.service;
+package com.example.backend.service.routh_hurwitz;
 
+import com.example.backend.service.EquationService;
 import org.apache.commons.math3.complex.Complex;
 import org.json.JSONArray;
 import org.json.JSONObject;

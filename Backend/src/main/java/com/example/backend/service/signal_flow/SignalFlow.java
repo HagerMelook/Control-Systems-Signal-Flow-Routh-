@@ -1,4 +1,6 @@
-package com.example.backend.service;
+package com.example.backend.service.signal_flow;
+
+import com.example.backend.service.signal_flow.Node;
 
 import java.util.ArrayList;
 
@@ -10,7 +12,7 @@ public class SignalFlow {
     ArrayList<Integer>loop_gain=new ArrayList<>();
     int temp=1;
 
-    public ArrayList<ArrayList<String>> GetForwardPaths(ArrayList<Node>graph,int start_index,int dest_index){
+    public ArrayList<ArrayList<String>> GetForwardPaths(ArrayList<Node>graph, int start_index, int dest_index){
         ArrayList<String> path = new ArrayList<>();
         ArrayList<Node>visited=new ArrayList<>();
         path.add(graph.get(start_index).getName());
