@@ -6,15 +6,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
-@CrossOrigin("")
+@CrossOrigin()
 @RestController
 @RequestMapping("/")
 public class Controller {
     @Autowired
     AppService appService = new AppService();
 
-    @GetMapping("/routh")
+    @PostMapping("/routh")
+    @ResponseBody
     public ResponseEntity<String> routhStabilityCheck(@RequestBody String equation) {
-        return new ResponseEntity<>(appService.routhHurwitz(equation), HttpStatus.OK);
+        equation = equation.replaceAll(" ", "");
+        if (equation.isEmpty())
+            return new ResponseEntity<>("Invalid Input", HttpStatus.BAD_REQUEST);
+        String output = appService.routhHurwitz(equation);
+        if (output.equals("Invalid Input"))
+            return new ResponseEntity<>(output, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(output, HttpStatus.OK);
     }
 }

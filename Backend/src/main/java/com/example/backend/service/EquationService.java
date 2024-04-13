@@ -2,6 +2,8 @@ package com.example.backend.service;
 
 import org.apache.commons.math3.analysis.solvers.LaguerreSolver;
 import org.apache.commons.math3.complex.Complex;
+
+import java.util.InputMismatchException;
 import java.util.List;
 
 /**
@@ -19,40 +21,49 @@ public class EquationService {
      * Parses the characteristic equation of the system.
      * @param equation The characteristic equation of the system to be parsed.
      */
-    public void parseEquation(String equation) { // equation >> 5s^2+10s+20
-        String[] terms = equation.replace("+", " ").replace("-", " -").split(" ");
-        int last_degree = Integer.MAX_VALUE;
-        for (String term : terms) {
-            int temp = last_degree;
-            String[] coeff_term = term.replace("s^", " ").replace("s", " ").split(" "); // {5, 2} --> {coeff, deg}
+    public void parseEquation(String equation) throws InputMismatchException { // equation >> 5s^2+10s+20
+        try {
+            String[] terms = equation.replace("+", " ").replace("-", " -").split(" ");
+            int last_degree = Integer.MAX_VALUE;
+            for (String term : terms) {
+                int temp = last_degree;
+                String[] coeff_term = term.replace("s^", " ").replace("s", " ").split(" "); // {5, 2} --> {coeff, deg}
 
-            if (coeff_term.length == 0) // "s"
-                last_degree = 1;
-            else if (coeff_term.length == 1)
-                last_degree = (term.contains("s") ? 1 : 0);
-            else
-                last_degree = Integer.parseInt(coeff_term[1]);
+                if (coeff_term.length == 0) // "s"
+                    last_degree = 1;
+                else if (coeff_term.length == 1)
+                    last_degree = (term.contains("s") ? 1 : 0);
+                else
+                    last_degree = Integer.parseInt(coeff_term[1]);
 
-            if (temp != Integer.MAX_VALUE) {
-                for (int i = 0; i < temp - last_degree - 1; ++i)
-                    this.coeff_list.add(0.0);
+                if (last_degree >= temp)
+                    throw new InputMismatchException("Invalid Input Order");
+
+                if (temp != Integer.MAX_VALUE) {
+                    for (int i = 0; i < temp - last_degree - 1; ++i)
+                        this.coeff_list.add(0.0);
+                }
+
+                double coeff;
+                if (coeff_term.length == 0 || coeff_term[0].isEmpty())
+                    coeff = 1.0;
+                else if (coeff_term[0].equals("-"))
+                    coeff = -1;
+                else
+                    coeff = Double.parseDouble(coeff_term[0]);
+                this.coeff_list.add(coeff);
             }
-
-            double coeff;
-            if (coeff_term.length == 0 || coeff_term[0].isEmpty())
-                coeff = 1.0;
-            else if (coeff_term[0].equals("-"))
-                coeff = -1;
-            else
-                coeff = Double.parseDouble(coeff_term[0]);
-            this.coeff_list.add(coeff);
+            for (int i = 0; i < last_degree; ++i)
+                this.coeff_list.add(0.0);
+            if (this.coeff_list.isEmpty())
+                throw new InputMismatchException("Invalid Input");
+            System.out.print("coeffs >>  ");
+            for (double coeff : this.coeff_list)
+                System.out.print(coeff + " ");
+            System.out.println();
+        } catch (Exception e) {
+            throw new InputMismatchException("Invalid Input");
         }
-        for (int i = 0; i < last_degree; ++i)
-            this.coeff_list.add(0.0);
-        System.out.print("coeffs >>  ");
-        for (double coeff : this.coeff_list)
-            System.out.print(coeff + " ");
-        System.out.println();
     }
 
     /**

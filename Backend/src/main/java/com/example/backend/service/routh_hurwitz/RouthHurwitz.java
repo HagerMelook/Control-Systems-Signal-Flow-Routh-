@@ -5,6 +5,7 @@ import org.apache.commons.math3.complex.Complex;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ public class RouthHurwitz {
     private EquationService equationService;
     private int stability;
 
-    public void init(String equation) {
+    public void init(String equation) throws InputMismatchException {
         this.stability = 0;
         this.coeff_list = new ArrayList<>();
         this.equationService = new EquationService(coeff_list);
@@ -110,10 +111,10 @@ public class RouthHurwitz {
     public JSONObject systemInfo() {
         JSONObject info = new JSONObject();
         int rhs_poles = countRhsPoles();
-        info.put("Stability", (stability == 0 ? "Not Stable" : (stability == 1) ? "Stable" : "Critically Stable"));
-        info.put("Routh Table", new JSONArray(this.routh_table));
+        info.put("Stability", (stability == 0 ? "Not Stable" : "Stable"));
+        info.put("Routh_Table", new JSONArray(this.routh_table));
         if (stability != 1) {
-            info.put("Number of RHS poles", rhs_poles);
+            info.put("Number_of_RHS_poles", rhs_poles);
             JSONArray rhsPolesArray = new JSONArray();
             List<Complex> rhsPolesComplex = rhsPoles();
             for (Complex pole : rhsPolesComplex) {
@@ -122,8 +123,9 @@ public class RouthHurwitz {
                 poleObject.put("Imaginary", pole.getImaginary());
                 rhsPolesArray.put(poleObject);
             }
-            info.put("RHS poles", rhsPolesArray);
+            info.put("RHS_poles", rhsPolesArray);
         }
+        System.out.println(info);
         return info;
     }
 }
