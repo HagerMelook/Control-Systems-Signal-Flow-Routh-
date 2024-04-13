@@ -1,4 +1,4 @@
-package com.lab1.signalflow.Services;
+package com.example.backend.service.signal_flow;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,8 +15,8 @@ public class SignalFlow {
     public ArrayList<ArrayList<Integer>> GetForwardPaths(ArrayList<Node>graph){
         ArrayList<Integer> path = new ArrayList<>();
         ArrayList<Node>visited=new ArrayList<>();
-        path.add(graph.getFirst().getId());
-        GetForwardPath(path, visited,path_gain, graph.getFirst(), graph.getLast());
+        path.add(graph.get(0).getId());
+        GetForwardPath(path, visited,path_gain, graph.get(0), graph.get(graph.size() - 1));
         return ForwardPaths;
     }
 
@@ -41,12 +41,12 @@ public class SignalFlow {
     
     // get loops and their gain
     HashMap<Integer,Double>temp_gain=new HashMap<>();
-    public ArrayList<ArrayList<Integer>> GetLoops(ArrayList<Node>graph){
+    public ArrayList<ArrayList<Integer>> GetLoops(ArrayList<Node> graph){
         ArrayList<Integer> loop = new ArrayList<>();
-        ArrayList<Node>visited=new ArrayList<>();
-        loop.add(graph.getFirst().getId());
+        ArrayList<Node> visited=new ArrayList<>();
+        loop.add(graph.get(0).getId());
         temp=1.0;
-        GetLoop(loop,visited,loop_gain, graph.getFirst(), graph.getLast());
+        GetLoop(loop,visited,loop_gain, graph.get(0), graph.get(graph.size() - 1));
         return Loops;
     }
     public void GetLoop(ArrayList<Integer>loop,ArrayList<Node>visited,ArrayList<Double>loop_gain,Node start,Node dest){

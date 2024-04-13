@@ -1,5 +1,5 @@
 
-package com.lab1.signalflow.Services;
+package com.example.backend.service.signal_flow;
 
 import java.util.ArrayList;
 
