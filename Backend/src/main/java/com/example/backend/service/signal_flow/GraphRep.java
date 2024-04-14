@@ -3,23 +3,6 @@ package com.example.backend.service.signal_flow;
 
 import java.util.ArrayList;
 
-class Node{
-
-    // each node has id, array of adjacent nodes, array of gain for each branch
-    public Node() {
-    }
-
-    private int id;
-    public ArrayList<Double> gain=new ArrayList<>();
-    public ArrayList<Node> adjacent=new ArrayList<>();
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-}
 
 public class GraphRep {
             public static void main(String[] args) {
@@ -131,14 +114,14 @@ public class GraphRep {
         }
         System.out.println("\nDelta for each path: "+path_delta);
 
-    // get overall transfer function
-    double overall_T_F=0.0;
-    for(int i = 0;i<forward_paths.size();i++){
-        overall_T_F+=signalFlow.path_gain.get(i)*path_delta.get(i);
+        // get overall transfer function
+        double overall_T_F=0.0;
+        for(int i = 0;i<forward_paths.size();i++){
+            overall_T_F+=signalFlow.path_gain.get(i)*path_delta.get(i);
+        }
+        overall_T_F/=delta;
+        System.out.println("\nOverall TF of the system: "+overall_T_F);
     }
-    overall_T_F/=delta;
-    System.out.println("\nOverall TF of the system: "+overall_T_F);
-}
 }
 
 
