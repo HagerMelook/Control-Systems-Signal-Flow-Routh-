@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 
 public class GraphRep {
-            public static void main(String[] args) {
+    public static void main(String[] args) {
 
             // Representation of the graph as adjacency list
             ArrayList<Node>graph=new ArrayList<>();
@@ -106,7 +106,7 @@ public class GraphRep {
                 if(!non_touched_loops.get(path_delta_gain.get(i).get(j)).isEmpty()){
                     for(Integer loop_index:non_touched_loops.get(path_delta_gain.get(i).get(j))){
                         if(path_delta_gain.get(i).contains(loop_index))
-                        path_loop_delta+=(signalFlow.loop_gain.get(path_delta_gain.get(i).get(j))*signalFlow.loop_gain.get(path_delta_gain.get(i).get(loop_index)))/2.0;
+                            path_loop_delta+=(signalFlow.loop_gain.get(path_delta_gain.get(i).get(j))*signalFlow.loop_gain.get(path_delta_gain.get(i).get(loop_index)))/2.0;
                     }
                 }
             }

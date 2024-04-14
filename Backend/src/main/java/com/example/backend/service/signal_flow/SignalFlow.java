@@ -67,7 +67,7 @@ public class SignalFlow {
                 for(int i=loop.indexOf(adj_node.getId());i<loop.size();i++){
                     temp_loop.add(loop.get(i));
                     if(i!=loop.size()-1)
-                    temp*=temp_gain.get(loop.get(i+1));
+                        temp*=temp_gain.get(loop.get(i+1));
                     
                 }
                 temp_loop.add(adj_node.getId());
@@ -102,7 +102,7 @@ public class SignalFlow {
     public ArrayList<Integer> GetNonTouchingLoops(ArrayList<Integer> current,ArrayList<ArrayList<Integer>> loops){
         boolean[]touched=new boolean[loops.size()];
         for(int j=0;j<loops.size();j++)
-        touched[j]=false;
+            touched[j]=false;
         for(Integer node :current){
             for(int i=0;i<loops.size();i++){
                 if(loops.get(i).contains(node)&&touched[i]==false){
@@ -112,8 +112,8 @@ public class SignalFlow {
         }
         ArrayList<Integer>non_touched=new ArrayList<>();
         for(int k =0;k<loops.size();k++)
-        if(!touched[k])
-            non_touched.add(k);
+            if(!touched[k])
+                non_touched.add(k);
         return non_touched;
     }
 
