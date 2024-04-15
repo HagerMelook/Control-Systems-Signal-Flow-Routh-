@@ -61,11 +61,11 @@ public class RouthHurwitz {
         checkAllZerosRow(1);
         for (int i = 2; i < this.routh_table.length; ++i) {
             for (int j = 0; j <  this.routh_table[i].length - i / 2; ++j) {
-                double determinant = this.routh_table[i - 1][0] * this.routh_table[i - 2][j + 1] - this.routh_table[i - 2][0] * this.routh_table[i - 1][j + 1];
                 if (this.routh_table[i - 1][0] == 0)
-                    this.routh_table[i][j] = determinant / 0.000001; // substitute zero with small value
-                else
-                    this.routh_table[i][j] = determinant / this.routh_table[i - 1][0];
+                    this.routh_table[i - 1][0] = 0.000001; // substitute zero with small value
+                double determinant = this.routh_table[i - 1][0] * this.routh_table[i - 2][j + 1] - this.routh_table[i - 2][0] * this.routh_table[i - 1][j + 1];
+//                determinant = Math.round(determinant * Math.pow(10, 5) / Math.pow(10, 5));
+                this.routh_table[i][j] = determinant / this.routh_table[i - 1][0];
             }
             checkAllZerosRow(i);
         }
