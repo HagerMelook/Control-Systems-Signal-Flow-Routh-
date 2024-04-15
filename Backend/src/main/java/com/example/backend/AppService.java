@@ -17,4 +17,8 @@ public class AppService {
         routhHurwitz.developRouthTable();
         return routhHurwitz.systemInfo().toString();
     }
+
+    public String signalFlowGraph() {
+
+    }
 }

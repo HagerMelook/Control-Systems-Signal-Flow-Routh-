@@ -24,4 +24,11 @@ public class Controller {
             return new ResponseEntity<>(output, HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(output, HttpStatus.OK);
     }
+
+    /* Signal Flow Graph API */
+    @GetMapping("/flowgraph/analysis")
+    public ResponseEntity<String> signalFlowGraphAnalysis() {
+
+    }
+
 }
