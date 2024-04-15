@@ -49,8 +49,6 @@
 
 <script>
 
-    //import axios from "axios" ;
-
     export default ({
         data() {
             return {
@@ -98,7 +96,7 @@
                 if(data.Stability == 'Not Stable'){
                     this.stable = false ;
                     this.RHS_poles = [] ;
-                    for (var i=0 ; i< data.Number_of_RHS_poles ; i++){
+                    for (var i=0 ; i< data.RHS_poles.length ; i++){
                         if(data.RHS_poles[i].Imaginary ==0)
                             this.RHS_poles.push(data.RHS_poles[i].Real) ;
                         else if(data.RHS_poles[i].Imaginary <0)
