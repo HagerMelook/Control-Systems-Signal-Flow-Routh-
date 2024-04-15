@@ -17,8 +17,7 @@ public class GraphRep {
     public void repGraph(){
         for(int i = 0;i<8;i++)
             graph.add(new Node());
-            for(int i = 0;i<8;i++)
-            graph.add(new Node());
+        
             graph.get(0).setId(0);
             graph.get(0).gain.add(1.0);
             graph.get(0).adjacent.add(graph.get(1));
