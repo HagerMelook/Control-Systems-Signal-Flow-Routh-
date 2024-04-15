@@ -2,106 +2,135 @@
   <div class="GUI">
     <input type="number" min="2" max="100" value="2" ref="statesNumber">
     <button @click="generateStates">Generate Nodes</button>
-    <button @click="null">Set Branches</button>
-    <button @click="null">Gain Analysis</button>
+    <button @click="analyze">Gain Analysis</button>
   </div>
-  <div ref="container">
-  </div>
-<!-- 
-  <div id="graph" @load="init" style="height:100px; widows:100px;">
+  <div id="myDiagramDiv" ref="myDiagramDiv" style="height:500px; widows:100px; border: 5px black solid; background-color: #DAE4E4;">
+  <div ref="container"></div>
 
-  </div> -->
+  </div>
 
 </template>
 
 <script>
 
 import axios from 'axios'
-import Konva from 'konva'
-// import Go from 'go'
+import Go from 'gojs'
 
 export default {
   data(){
     return{
       nodes : [],
-      nodeXY :[200,200],
-      go : null,
     }
   },
 
   methods:{
     
-
-    // init(){
-      
-    //   // graph = go(graph,"graph");
-    // },
-
     generateStates(){
       let numberOfNodes = this.$refs.statesNumber.value;
       console.log(numberOfNodes);
-      //send nodes to backend
-
-      this.initialize();
-      for (let i=0;i<numberOfNodes;i++){
-        let c= new Konva.Circle({
-          radius : 15,
-          id: i,
-          fill:"black",
-        });
-        let t=new Konva.Text({
-          fontSize: 15,
-          fontFamily: 'Calibri',
-          width: 25,
-          align: 'center',
-          x: c.x()-13,
-          y: this.nodeXY[1]-56,
-        });
-        if (i==0||i==numberOfNodes-1){
-          c.fill("white");
-          c.stroke("black");
-          if(i==0) t.text("C(S)");
-          else t.text("R(S)"); 
-        }
-        else{
-          t.stroke("white")
-          t.text(i);
-        }
-        let g=new Konva.Group({
-          x: this.nodeXY[0]=this.nodeXY[0]+50,
-          y: this.nodeXY[1],
-          draggable: true,
-          id: i,
-        });
-        g.add(c).add(t);
-        this.nodes[i]=g;
-        this.nodes[i].add(c);
-        this.nodes[i].add(t);
-        this.layer.add(this.nodes[i]);
-      }
-    },
-
-    initialize(){
-      this.layer.destroyChildren().batchDraw()
-      this.nodeXY=[50,50];
       this.nodes=[];
+      for (let i=0;i<numberOfNodes;i++){
+        if(i==0) this.nodes[i]={name:"C(S)",color:"RGB(193,193,214)",fontColor:"black"}
+        else if(i==numberOfNodes-1) this.nodes[i]={name:"R(S)",color:"RGB(193,193,214)",fontColor:"black"}
+        else this.nodes[i]={name:i,color:"RGB(64,70,103)",fontColor:"white"}
+      }
+      this.myDiagram.model = new go.GraphLinksModel(this.nodes);
     },
-
+    modifyGain(e){
+      console.log(e)
+      e.subject.part.data.gain=e.Yr.kc;
+      // console.log(e.subject.part.data);
+      // console.log(e.subject.name);
+    //   this.myDiagram.commit(d => {
+    //     d.links.each(link => {
+    //     console.log(link.data)
+    // });
+    //   }, "decrease scale");
+    },
+    analyze(){
+      let links=[], i=0;
+      this.myDiagram.commit(d => {
+        d.links.each(link => {
+          links[i++]={
+            "from" : Math.abs(link.data.from)-1,
+            "to" : Math.abs(link.data.to)-1,
+            "gain" : link.data.gain,
+          }
+        });
+      }, "decrease scale");
+      let req = {
+        "numberOfNodes" : this.$refs.statesNumber.value,
+        "branches" : links
+      };
+      console.log(JSON.stringify(req))
+      axios.post("http://localhost:8080/flowgraph",JSON.stringify(req));
+    }
   },
 
   mounted(){
-    this.stage = new Konva.Stage({
-      container: this.$refs.container,
-      width: window.innerWidth*97/100,
-      height: window.innerHeight*86/100,
-      id :0,
-      name: 'container'
-    });
-    this.layer = new Konva.Layer();
-    this.stage.add(this.layer);
+  
+    this.myDiagram =new go.Diagram("myDiagramDiv",{
+      "undoManager.isEnabled": true,
+      "TextEdited": this.modifyGain,
+      });
+    this.myDiagram.nodeTemplate = new go.Node("Auto",{})
+    .add(new go.Shape("Ellipse",{
+      width: 35,
+      height: 35, 
+      background: null, 
+      portId: "",
+      // toLinkableDuplicates:true,
+      fromLinkable: true,
+      toLinkable: true,
+      relinkableFrom:true,
+      relinkableTo:true,
+      cursor: "pointer"
+    })
+      .bind("fill","color")
+      .bind("portId","id"))
+    .add(new go.TextBlock("",{
+      stroke: "white",
+      font: "bold 12px sans-serif",
+      verticalAlignment: go.Spot.Center,
+      textAlign: "center",
+      cursor:"pointer"
+    })
+      .bind("text", "name")
+      .bind("stroke","fontColor")
+    );
+    
+    this.myDiagram.linkTemplate =new go.Link({
+      curve: go.Link.Bezier,
+      reshapable:true,
+      adjusting: go.Link.Stretch,
+      strokeWidth: 2,
+      toShortLength: 6,
+      relinkableFrom:true,
+      relinkableTo:true,
+    })
+    .add(new go.Shape({
+      strokeWidth: 3,
+      stroke: "black",
+    }))
+    .add(new go.Shape({
+      fill: "black",
+      stroke: null,
+      toArrow: "Standard",
+      scale:1.2,
+      stroke: "black"
+    }))
+    .add(new go.TextBlock("",{
+      segmentOffset: new go.Point(0,-15),
+      font:"bold 12px sans-serif",
+      editable:true,
+    })
+      .bind("text","gain")
+    )
+      this.myDiagram.toolManager.linkingTool.archetypeLinkData  =
+        { gain : 1 };
+    },
+    
   }
-
-}
 </script>
 
 <style scoped>
