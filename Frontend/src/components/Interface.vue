@@ -48,19 +48,20 @@ export default {
     //   }, "decrease scale");
     },
     analyze(){
-      let links=[], i=0;
+      let from=[],to=[],gains=[], i=0;
       this.myDiagram.commit(d => {
         d.links.each(link => {
-          links[i++]={
-            "from" : Math.abs(link.data.from)-1,
-            "to" : Math.abs(link.data.to)-1,
-            "gain" : link.data.gain,
+          from[i] = Math.abs(link.data.from)-1;
+          to[i] = Math.abs(link.data.to)-1;
+          gains[i++] = link.data.gain;
           }
-        });
+        );
       }, "decrease scale");
       let req = {
-        "numberOfNodes" : this.$refs.statesNumber.value,
-        "branches" : links
+        "nodes" : this.$refs.statesNumber.value,
+        "from" : from,
+        "to" : to,
+        "gains" : gains,
       };
       console.log(JSON.stringify(req))
       axios.post("http://localhost:8080/flowgraph",JSON.stringify(req));
