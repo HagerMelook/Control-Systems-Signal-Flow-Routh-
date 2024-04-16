@@ -44,10 +44,7 @@ public class AppService {
             int to = toJson.getInt(i);
             graph.get((int) from).adjacent.add(graph.get(to));
             double gain = gainsJson.getDouble(i++);
-            if (to < (int) from)
-                graph.get((int) from).gain.add(gain * -1.0);
-            else
-                graph.get((int) from).gain.add(gain);
+            graph.get((int) from).gain.add(gain);
 
         }
         this.graphRep.constructGraph(graph);
