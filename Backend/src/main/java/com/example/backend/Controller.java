@@ -26,9 +26,15 @@ public class Controller {
     }
 
     /* Signal Flow Graph API */
+    @PostMapping("/flowgraph")
+    @ResponseBody
+    public void signalFlowGraph(@RequestBody String graph) {
+        this.appService.signalFlowGraph(graph);
+    }
+
     @GetMapping("/flowgraph/analysis")
     public ResponseEntity<String> signalFlowGraphAnalysis() {
-
+        return new ResponseEntity<>(appService.signalFlowGraphAnalysis(), HttpStatus.OK);
     }
 
 }
