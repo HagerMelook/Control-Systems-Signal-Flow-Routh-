@@ -13,7 +13,7 @@ import java.util.InputMismatchException;
 
 @Service
 public class AppService {
-    private GraphRep graphRep = new GraphRep();
+    private GraphRep graphRep;
 
     public String routhHurwitz(String equation) {
         RouthHurwitz routhHurwitz = new RouthHurwitz();
@@ -27,10 +27,29 @@ public class AppService {
     }
 
     public void signalFlowGraph(String graphStr) {
-        Gson gson = new Gson();
+        this.graphRep = new GraphRep();
         ArrayList<Node> graph = new ArrayList<>();
         JSONObject graphJson = new JSONObject(graphStr);
+        int nodes = graphJson.getInt("nodes");
 
+        JSONArray fromJson = graphJson.getJSONArray("from");
+        JSONArray toJson = graphJson.getJSONArray("to");
+        JSONArray gainsJson = graphJson.getJSONArray("gains");
+
+        for (int i = 0; i < nodes; ++i)
+            graph.add(new Node(i));
+
+        int i = 0;
+        for (Object from : fromJson.toList()) {
+            int to = toJson.getInt(i);
+            graph.get((int) from).adjacent.add(graph.get(to));
+            double gain = gainsJson.getDouble(i++);
+            if (to < (int) from)
+                graph.get((int) from).gain.add(gain * -1.0);
+            else
+                graph.get((int) from).gain.add(gain);
+
+        }
         this.graphRep.constructGraph(graph);
     }
 
@@ -81,13 +100,14 @@ public class AppService {
         }
         analysis.put("Non_Touching_Loops", nonTouchingLoopsJson);
 
+        analysis.put("Delta", this.graphRep.getDelta());
+
+        this.graphRep.getLoopsForEachPath();
         ArrayList<Double> deltas = this.graphRep.getPathDelta();
         JSONArray deltasJson = new JSONArray();
         for (double delta : deltas)
             deltasJson.put(delta);
         analysis.put("Deltas", deltasJson);
-
-        analysis.put("Delta", this.graphRep.getDelta());
 
         analysis.put("Transfer_Function", this.graphRep.getOverallTF());
 
