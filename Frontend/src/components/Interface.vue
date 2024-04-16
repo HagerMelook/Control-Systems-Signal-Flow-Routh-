@@ -80,26 +80,18 @@
 
 import axios from 'axios';
 import Go from 'gojs';
-// import ForwardPath from '@/components/forwardPaths.vue';
-// import IndividualLoop from '@/components/individualLoops.vue';
-// import nontouchingLoop from '@/components/nontouching.vue';
 
 export default {
-  // components:{
-  //   ForwardPath,
-  //   IndividualLoop,
-  //   nontouchingLoop
-  // },
 
   data(){
     return{
       server: 'http://localhost:8080',
       nodes : [],
-      forwardpaths:[{id:1 ,Path:[1,2,3] , Gain: "45" ,Delta: 22}],
+      forwardpaths:[],
       fpId: 0,
-      individualloops:[{id:1 ,Path:[1,2,1] , Gain: "45"}],
+      individualloops:[],
       loopId: 0,
-      nontouchingloops:[[[1,2],[3,2]],[[1,2,3],[4,5,2]]],
+      nontouchingloops:[],
       delta: 0,
       transferFunction: 0,
     }
@@ -148,12 +140,13 @@ export default {
       console.log(JSON.stringify(req))
       axios.post("http://localhost:8080/flowgraph",JSON.stringify(req));
 
-      const response = await axios.get(this.server+'/analysis')
+      const response = await axios.get("http://localhost:8080/flowgraph/analysis")
       let analysis = response.data
+
       console.log(resposne.data)
 
-      analysis.Delta = this.delta
-      analysis.Transfer_Function = this.transferFunction
+      this.delta = analysis.Delta 
+      this.transferFunction = analysis.Transfer_Function
 
       for(let i = 0 ;i < analysis.Forward_Paths.length ;i++)
       {
@@ -161,25 +154,31 @@ export default {
           id: this.fpId++,
           Path: analysis.Forward_Paths[i],
           Gain: analysis.Forward_Paths_Gains[i],
+          Delta: analysis.Deltas[i]
         }
         this.forwardpaths.push(forwardPath)
       }
+      console.log("fpath")
+      console.log(this.forwardpaths)
 
       for(let i = 0 ;i < analysis.Loops.length ;i++)
       {
         var loop ={
-          id: this.loopId,
+          id: this.loopId++,
           Path: analysis.Loops[i],
           Gain: analysis.Loops_Gains[i],
-          Delta: analysis.Deltas[i]
         }
         this.individualloops.push(loop)
       }
+      console.log("loop")
+      console.log(this.individualloops)
 
-      var ntLoops = []
+      let ntLoops = []
+      let lastSize = 2;
+      console.log(analysis.Non_Touching_Loops[i].length)
       for(let i = 0 ;i < analysis.Non_Touching_Loops.length ;i++)
       {
-        currentSize = analysis.Non_Touching_Loops[i].length
+        let currentSize = analysis.Non_Touching_Loops[i].length
         if(currentSize != lastSize)
         {
           this.nontouchingloops.push(ntLoops)
@@ -187,6 +186,7 @@ export default {
         }
         ntLoops.push(analysis.Non_Touching_Loops[i])
         lastSize = currentSize 
+        console.log(this.ntLoops)
       }
       this.showOutput()
     }
