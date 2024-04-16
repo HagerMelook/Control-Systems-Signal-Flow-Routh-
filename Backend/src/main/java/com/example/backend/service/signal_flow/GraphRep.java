@@ -12,7 +12,7 @@ public class GraphRep {
     private ArrayList<ArrayList<Integer>> non_touched_loops;
     private final ArrayList<ArrayList<Integer>> path_delta_gain;
     private Double delta;
-    private final SignalFlow signalFlow;
+    private SignalFlow signalFlow;
 
     public GraphRep() {
         this.graph = new ArrayList<>();
@@ -26,46 +26,12 @@ public class GraphRep {
     }
 
     public void constructGraph(ArrayList<Node> graph) {
+        this.signalFlow = new SignalFlow();
         this.graph = graph;
     }
 
-    public void repGraph(){
-        for(int i = 0; i < 8; i++)
-            graph.add(new Node(i));
-
-        graph.get(0).gain.add(1.0);
-        graph.get(0).adjacent.add(graph.get(1));
-        graph.get(0).gain.add(5.0);
-        graph.get(0).adjacent.add(graph.get(4));
-
-        graph.get(1).gain.add(2.0);
-        graph.get(1).adjacent.add(graph.get(2));
-
-        graph.get(2).gain.add(-1.0);
-        graph.get(2).adjacent.add(graph.get((1)));
-        graph.get(2).gain.add(3.0);
-        graph.get(2).adjacent.add(graph.get((3)));
-
-        graph.get(3).gain.add(-2.0);
-        graph.get(3).adjacent.add(graph.get(2));
-        graph.get(3).gain.add(4.0);
-        graph.get(3).adjacent.add(graph.get(7));
-
-        graph.get(4).gain.add(6.0);
-        graph.get(4).adjacent.add(graph.get(5));
-
-        graph.get(5).gain.add(7.0);
-        graph.get(5).adjacent.add(graph.get(6));
-        graph.get(5).gain.add(-3.0);
-        graph.get(5).adjacent.add(graph.get(4));
-
-        graph.get(6).gain.add(8.0);
-        graph.get(6).adjacent.add(graph.get(7));
-        graph.get(6).gain.add(-4.0);
-        graph.get(6).adjacent.add(graph.get(5));
-    }
-
     public ArrayList<ArrayList<Integer>> getForwardPaths(){
+        System.out.println(graph.size());
         forward_paths=signalFlow.GetForwardPaths(graph);
         return forward_paths;
     }
@@ -92,8 +58,8 @@ public class GraphRep {
     }
 
     public ArrayList<ArrayList<Integer>> getLoopsForEachPath(){
-        for(int i = 0;i<forward_paths.size();i++){
-            path_delta_gain.add((ArrayList<Integer>)signalFlow.getLoopsForPath(forward_paths.get(i), loops));
+        for (ArrayList<Integer> forwardPath : forward_paths) {
+            path_delta_gain.add((ArrayList<Integer>) signalFlow.getLoopsForPath(forwardPath, loops));
         }
         return path_delta_gain;
     }

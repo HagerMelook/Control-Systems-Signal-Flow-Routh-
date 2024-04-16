@@ -138,12 +138,10 @@ export default {
         "gains" : gains,
       };
       console.log(JSON.stringify(req))
-      axios.post("http://localhost:8080/flowgraph",JSON.stringify(req));
+      await axios.post("http://localhost:8080/flowgraph", req);
 
       const response = await axios.get("http://localhost:8080/flowgraph/analysis")
       let analysis = response.data
-
-      console.log(resposne.data)
 
       this.delta = analysis.Delta 
       this.transferFunction = analysis.Transfer_Function
@@ -175,7 +173,6 @@ export default {
 
       let ntLoops = []
       let lastSize = 2;
-      console.log(analysis.Non_Touching_Loops[i].length)
       for(let i = 0 ;i < analysis.Non_Touching_Loops.length ;i++)
       {
         let currentSize = analysis.Non_Touching_Loops[i].length

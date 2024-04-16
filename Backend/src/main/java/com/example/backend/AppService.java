@@ -3,7 +3,6 @@ package com.example.backend;
 import com.example.backend.service.routh_hurwitz.RouthHurwitz;
 import com.example.backend.service.signal_flow.GraphRep;
 import com.example.backend.service.signal_flow.Node;
-import com.google.gson.Gson;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,7 @@ import java.util.InputMismatchException;
 
 @Service
 public class AppService {
-    private GraphRep graphRep;
+    private GraphRep graphRep = new GraphRep();
 
     public String routhHurwitz(String equation) {
         RouthHurwitz routhHurwitz = new RouthHurwitz();
@@ -27,6 +26,8 @@ public class AppService {
     }
 
     public void signalFlowGraph(String graphStr) {
+        JSONObject j = new JSONObject(graphStr);
+        System.out.println("graph : " + j.toString());
         this.graphRep = new GraphRep();
         ArrayList<Node> graph = new ArrayList<>();
         JSONObject graphJson = new JSONObject(graphStr);
@@ -45,7 +46,6 @@ public class AppService {
             graph.get((int) from).adjacent.add(graph.get(to));
             double gain = gainsJson.getDouble(i++);
             graph.get((int) from).gain.add(gain);
-
         }
         this.graphRep.constructGraph(graph);
     }
