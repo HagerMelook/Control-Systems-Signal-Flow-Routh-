@@ -1,25 +1,107 @@
 <template>
-  <div class="GUI">
-    <input type="number" min="2" max="100" value="2" ref="statesNumber">
-    <button @click="generateStates">Generate Nodes</button>
-    <button @click="analyze">Gain Analysis</button>
-  </div>
-  <div id="myDiagramDiv" ref="myDiagramDiv" style="height:500px; widows:100px; border: 5px black solid; background-color: #DAE4E4;">
-  <div ref="container"></div>
+  <h1>Signal Flow Graph Analyzer</h1>
+  <div style="height: 88vh">
+    <div class="GUI">
+      <div id="myDiagramDiv" style="height:70vh; width :100%;border-radius: 25px; background-color:white  ">
+        <div ref="container"></div>
+      </div>
 
+      <div id ="input">
+        <input type="number" min="2" max="100" value="2" ref="statesNumber" style="height: 35px; border-radius: 10px; text-align:center; margin-top:15%; font-size:16px; background-color: rgb(234, 237, 241); ">
+        <button @click="generateStates">Generate Nodes</button>
+        <button @click="analyze">Gain Analysis</button>
+      </div>
+    </div>
   </div>
 
+  <div id ="output" >
+    <h1>Analysis</h1>
+    <div style="padding: 1%;">
+      <div id ="output-fields" >
+        <h2>Forward paths:</h2>
+        <table>
+          <tr>
+            <th></th>
+            <th></th>
+            <th>Gain</th>
+            <th>&Delta;</th>
+          </tr>
+          <tr v-for = "forwardpath in forwardpaths">
+              <td>Path{{forwardpath.id}}</td>
+              <td><span v-for= "(path,index) in forwardpath.Path" :key = "index">{{path}}-</span></td>
+              <td>{{ forwardpath.Gain }}</td>
+              <td>{{ forwardpath.Delta }}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div id ="output-fields">
+        <h2>Individual loops:</h2>
+        <table>
+          <tr>
+            <th></th>
+            <th></th>
+            <th>Gain</th>
+          </tr>
+          <tr v-for = "individualloop in individualloops">
+              <td>Loop{{individualloop.id}}</td>
+              <td><span v-for= "(indloop,index) in individualloop.Path" :key = "index">{{indloop}}-</span></td>
+              <td>{{individualloop.Gain }}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div id ="output-fields">
+        <h2>Non-touching loops:</h2>
+        <table style="width: 50%; margin-bottom: 20px;" v-for="nontouchingloop in nontouchingloops">
+          <tr>
+              <th>{{nontouchingloop[0].length}} non-touching Loops</th>
+          </tr>
+          <tr v-for="ntloop in nontouchingloop">
+            <td><span v-for= "(loop,index) in ntloop" :key = "index">Loop{{loop}},</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <div id ="output-fields">
+        <h2 style="font-size: 30px;">&Delta; = <span style="font-weight:100; color: black;">{{ delta }}</span></h2>
+      </div>
+
+      <div id ="output-fields">
+        <h2>TF = <span style="font-weight:100; color: black;">{{ transferFunction }}</span></h2>
+        <span></span>
+      </div>
+
+    </div>
+  </div>
 </template>
 
 <script>
 
-import axios from 'axios'
-import Go from 'gojs'
+import axios from 'axios';
+import Go from 'gojs';
+// import ForwardPath from '@/components/forwardPaths.vue';
+// import IndividualLoop from '@/components/individualLoops.vue';
+// import nontouchingLoop from '@/components/nontouching.vue';
 
 export default {
+  // components:{
+  //   ForwardPath,
+  //   IndividualLoop,
+  //   nontouchingLoop
+  // },
+
   data(){
     return{
+      server: 'http://localhost:8080',
       nodes : [],
+      forwardpaths:[{id:1 ,Path:[1,2,3] , Gain: "45" ,Delta: 22}],
+      fpId: 0,
+      individualloops:[{id:1 ,Path:[1,2,1] , Gain: "45"}],
+      loopId: 0,
+      nontouchingloops:[[[1,2],[3,2]],[[1,2,3],[4,5,2]]],
+      delta: 0,
+      transferFunction: 0,
     }
   },
 
@@ -47,7 +129,7 @@ export default {
     // });
     //   }, "decrease scale");
     },
-    analyze(){
+    async analyze(){
       let from=[],to=[],gains=[], i=0;
       this.myDiagram.commit(d => {
         d.links.each(link => {
@@ -65,6 +147,52 @@ export default {
       };
       console.log(JSON.stringify(req))
       axios.post("http://localhost:8080/flowgraph",JSON.stringify(req));
+
+      const response = await axios.get(this.server+'/analysis')
+      let analysis = response.data
+      console.log(resposne.data)
+
+      analysis.Delta = this.delta
+      analysis.Transfer_Function = this.transferFunction
+
+      for(let i = 0 ;i < analysis.Forward_Paths.length ;i++)
+      {
+        var forwardPath ={
+          id: this.fpId++,
+          Path: analysis.Forward_Paths[i],
+          Gain: analysis.Forward_Paths_Gains[i],
+        }
+        this.forwardpaths.push(forwardPath)
+      }
+
+      for(let i = 0 ;i < analysis.Loops.length ;i++)
+      {
+        var loop ={
+          id: this.loopId,
+          Path: analysis.Loops[i],
+          Gain: analysis.Loops_Gains[i],
+          Delta: analysis.Deltas[i]
+        }
+        this.individualloops.push(loop)
+      }
+
+      var ntLoops = []
+      for(let i = 0 ;i < analysis.Non_Touching_Loops.length ;i++)
+      {
+        currentSize = analysis.Non_Touching_Loops[i].length
+        if(currentSize != lastSize)
+        {
+          this.nontouchingloops.push(ntLoops)
+          ntLoops = []
+        }
+        ntLoops.push(analysis.Non_Touching_Loops[i])
+        lastSize = currentSize 
+      }
+      this.showOutput()
+    }
+    ,showOutput() {
+        var x = document.getElementById("output")
+        x.style.display = 'block'
     }
   },
 
@@ -135,18 +263,89 @@ export default {
 </script>
 
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+
+  h2 {
+    margin: 40px 0 0;
+    margin-bottom: 2%;
+  }
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  li {
+    display: inline-block;
+    margin: 0 10px;
+  }
+  a {
+    color: #47bea7;
+  }
+  h1{
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 60px;
+    margin-top: 0;
+  }
+  h2{
+    margin-bottom:12px;
+    font-size: 30px;
+  }
+  button{
+    display: block;
+    color:azure;
+    background-color: rgb(64, 70, 103);
+    height: 60px;
+    width: 160px;
+    margin-left: 7px; 
+    margin-right: 7px;
+    margin-top: 40%;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  button:hover{
+    background-color: rgb(60, 54, 82);
+  }
+  table {
+        width: 100%;
+        border-collapse: collapse;
+  }
+  th, td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+  }
+  th {
+      background-color: #f2f2f2;
+  }
+  tr {
+      border-top: 1px solid #dddddd;
+      border-bottom: 1px solid #dddddd;
+  }
+
+  .GUI{
+    height: fit-content;
+    border: 3px solid rgb(40, 38, 58);
+    border-radius: 25px;
+    display: flex;
+  }
+  #input{
+    width: fit-content;
+    border-left: 3px solid rgb(40, 38, 58);
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+    background-color: rgb(193, 193, 214);
+  }
+  #output{
+    height: fit-content;
+    margin-top: -5%;
+    border-top: 0px;
+    background-color: white;
+    border: 3px solid rgb(40, 38, 58);
+    border-radius: 25px;
+    display:none
+  }
+  #output-fields{
+    text-align: left;
+  }
+
 </style>
