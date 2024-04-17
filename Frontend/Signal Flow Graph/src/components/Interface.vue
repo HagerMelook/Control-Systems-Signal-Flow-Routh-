@@ -22,13 +22,13 @@
         <table>
           <tr>
             <th></th>
-            <th></th>
+            <th>Path</th>
             <th>Gain</th>
             <th>&Delta;</th>
           </tr>
           <tr v-for = "forwardpath in forwardpaths">
               <td>Path{{forwardpath.id}}</td>
-              <td><span v-for= "(path,index) in forwardpath.Path" :key = "index">{{path}}-</span></td>
+              <td><span v-for= "(path,index) in forwardpath.Path" :key = "index">{{path}}<span v-if="index != forwardpath.Path.length - 1"> - </span></span></td>
               <td>{{ forwardpath.Gain }}</td>
               <td>{{ forwardpath.Delta }}</td>
           </tr>
@@ -40,25 +40,25 @@
         <table>
           <tr>
             <th></th>
-            <th></th>
+            <th>Loop</th>
             <th>Gain</th>
           </tr>
           <tr v-for = "individualloop in individualloops">
               <td>Loop{{individualloop.id}}</td>
-              <td><span v-for= "(indloop,index) in individualloop.Path" :key = "index">{{indloop}}-</span></td>
+              <td><span v-for= "(indloop,index) in individualloop.Path" :key = "index">{{indloop}}<span v-if="index != individualloop.Path.length - 1"> - </span></span></td>
               <td>{{individualloop.Gain }}</td>
           </tr>
         </table>
       </div>
 
       <div id ="output-fields">
-        <h2>Non-touching loops:</h2>
+        <h2>Non-Touching Loops:</h2>
         <table style="width: 50%; margin-bottom: 20px;" v-for="nontouchingloop in nontouchingloops">
           <tr>
-              <th>{{nontouchingloop[0].length}} non-touching Loops</th>
+              <th>{{nontouchingloop[0].length}} Non-Touching Loops</th>
           </tr>
           <tr v-for="ntloop in nontouchingloop">
-            <td><span v-for= "(loop,index) in ntloop" :key = "index">Loop{{loop}},</span></td>
+            <td><span v-for= "(loop,index) in ntloop" :key = "index">Loop{{loop}}<span v-if="index != ntloop.length - 1"> - </span></span></td>
           </tr>
         </table>
       </div>
@@ -142,7 +142,7 @@ export default {
 
       const response = await axios.get("http://localhost:8080/flowgraph/analysis")
       let analysis = response.data
-
+      
       this.delta = analysis.Delta 
       this.transferFunction = analysis.Transfer_Function
 
@@ -156,8 +156,6 @@ export default {
         }
         this.forwardpaths.push(forwardPath)
       }
-      console.log("fpath")
-      console.log(this.forwardpaths)
 
       for(let i = 0 ;i < analysis.Loops.length ;i++)
       {
@@ -168,8 +166,6 @@ export default {
         }
         this.individualloops.push(loop)
       }
-      console.log("loop")
-      console.log(this.individualloops)
 
       let ntLoops = []
       let lastSize = 2;
@@ -183,7 +179,10 @@ export default {
         }
         ntLoops.push(analysis.Non_Touching_Loops[i])
         lastSize = currentSize 
-        console.log(this.ntLoops)
+        if(i == analysis.Non_Touching_Loops.length -1)
+        {
+          this.nontouchingloops.push(ntLoops)
+        }
       }
       this.showOutput()
     }
@@ -308,11 +307,13 @@ export default {
   }
   th, td {
       border: 1px solid #dddddd;
-      text-align: left;
+      text-align: center;
       padding: 8px;
+      font-size: 25px;
   }
   th {
       background-color: #f2f2f2;
+      font-size: 25px;
   }
   tr {
       border-top: 1px solid #dddddd;
