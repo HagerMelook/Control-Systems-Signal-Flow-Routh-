@@ -93,7 +93,7 @@ export default {
       loopId: 0,
       nontouchingloops:[],
       delta: 0,
-      transferFunction: '',
+      transferFunction: 0,
     }
   },
 
@@ -150,7 +150,7 @@ export default {
       this.individualloops = []
       this.nontouchingloops = []
       this.delta = 0
-      this. transferFunction = ''
+      this. transferFunction = 0
 
       const response = await axios.get("http://localhost:8080/flowgraph/analysis")
       let analysis = response.data
