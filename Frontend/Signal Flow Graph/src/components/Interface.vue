@@ -140,6 +140,12 @@ export default {
       console.log(JSON.stringify(req))
       await axios.post("http://localhost:8080/flowgraph", req);
 
+      this.fpId = 0
+      this.loopId = 0
+      this.forwardpaths = []
+      this.individualloops = []
+      this.nontouchingloops = []
+
       const response = await axios.get("http://localhost:8080/flowgraph/analysis")
       let analysis = response.data
       
