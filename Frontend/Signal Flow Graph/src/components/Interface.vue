@@ -26,7 +26,7 @@
             <th>Gain</th>
             <th>&Delta;</th>
           </tr>
-          <tr v-for = "forwardpath in forwardpaths">
+          <tr v-for = "forwardpath in forwardpaths" :key ="forwardpath.id">
               <td>Path{{forwardpath.id}}</td>
               <td><span v-for= "(path,index) in forwardpath.Path" :key = "index">{{path}}<span v-if="index != forwardpath.Path.length - 1"> - </span></span></td>
               <td>{{ forwardpath.Gain }}</td>
@@ -43,7 +43,7 @@
             <th>Loop</th>
             <th>Gain</th>
           </tr>
-          <tr v-for = "individualloop in individualloops">
+          <tr v-for = "individualloop in individualloops" :key ="individualloop.id">
               <td>Loop{{individualloop.id}}</td>
               <td><span v-for= "(indloop,index) in individualloop.Path" :key = "index">{{indloop}}<span v-if="index != individualloop.Path.length - 1"> - </span></span></td>
               <td>{{individualloop.Gain }}</td>
@@ -53,11 +53,11 @@
 
       <div id ="output-fields">
         <h2>Non-Touching Loops:</h2>
-        <table style="width: 50%; margin-bottom: 20px;" v-for="nontouchingloop in nontouchingloops">
+        <table style="width: 50%; margin-bottom: 20px;" v-for="nontouchingloop in nontouchingloops" :key ="nontouchingloop">
           <tr>
               <th>{{nontouchingloop[0].length}} Non-Touching Loops</th>
           </tr>
-          <tr v-for="ntloop in nontouchingloop">
+          <tr v-for="ntloop in nontouchingloop" :key="ntloop">
             <td><span v-for= "(loop,index) in ntloop" :key = "index">Loop{{loop}}<span v-if="index != ntloop.length - 1"> - </span></span></td>
           </tr>
         </table>
