@@ -104,8 +104,8 @@ export default {
       console.log(numberOfNodes);
       this.nodes=[];
       for (let i=0;i<numberOfNodes;i++){
-        if(i==0) this.nodes[i]={name:"C(S)",color:"RGB(193,193,214)",fontColor:"black"}
-        else if(i==numberOfNodes-1) this.nodes[i]={name:"R(S)",color:"RGB(193,193,214)",fontColor:"black"}
+        if(i==0) this.nodes[i]={name:"R(S)",color:"RGB(193,193,214)",fontColor:"black",receive:false}
+        else if(i==numberOfNodes-1) this.nodes[i]={name:"C(S)",color:"RGB(193,193,214)",fontColor:"black",from:false}
         else this.nodes[i]={name:i,color:"RGB(64,70,103)",fontColor:"white"}
       }
       this.myDiagram.model = new go.GraphLinksModel(this.nodes);
@@ -204,7 +204,10 @@ export default {
       height: 35, 
       background: null, 
       portId: "",
-      // toLinkableDuplicates:true,
+      toLinkableDuplicates:true,
+      fromLinkableDuplicates:true,
+      toLinkableSelfNode:true,
+      fromLinkableSelfNode:true,
       fromLinkable: true,
       toLinkable: true,
       relinkableFrom:true,
@@ -212,7 +215,9 @@ export default {
       cursor: "pointer"
     })
       .bind("fill","color")
-      .bind("portId","id"))
+      .bind("portId","id")
+      .bind("toLinkable","receive")
+      .bind("fromLinkable","from"))
     .add(new go.TextBlock("",{
       stroke: "white",
       font: "bold 12px sans-serif",
