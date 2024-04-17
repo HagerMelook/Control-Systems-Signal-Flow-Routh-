@@ -93,7 +93,7 @@ export default {
       loopId: 0,
       nontouchingloops:[],
       delta: 0,
-      transferFunction: 0,
+      transferFunction: '',
     }
   },
 
@@ -122,7 +122,9 @@ export default {
     //   }, "decrease scale");
     },
     async analyze(){
+      
       let from=[],to=[],gains=[], i=0;
+      
       this.myDiagram.commit(d => {
         d.links.each(link => {
           from[i] = Math.abs(link.data.from)-1;
@@ -131,12 +133,14 @@ export default {
           }
         );
       }, "decrease scale");
+      
       let req = {
         "nodes" : this.$refs.statesNumber.value,
         "from" : from,
         "to" : to,
         "gains" : gains,
       };
+      
       console.log(JSON.stringify(req))
       await axios.post("http://localhost:8080/flowgraph", req);
 
@@ -145,6 +149,8 @@ export default {
       this.forwardpaths = []
       this.individualloops = []
       this.nontouchingloops = []
+      this.delta = 0
+      this. transferFunction = ''
 
       const response = await axios.get("http://localhost:8080/flowgraph/analysis")
       let analysis = response.data
@@ -204,6 +210,7 @@ export default {
       "undoManager.isEnabled": true,
       "TextEdited": this.modifyGain,
       });
+    
     this.myDiagram.nodeTemplate = new go.Node("Auto",{})
     .add(new go.Shape("Ellipse",{
       width: 35,
