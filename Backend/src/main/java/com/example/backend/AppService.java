@@ -105,9 +105,16 @@ public class AppService {
         for (double delta : deltas)
             deltasJson.put(delta);
         analysis.put("Deltas", deltasJson);
+        double tf = this.graphRep.getOverallTF();
+        System.out.println("TF: " + this.graphRep.getOverallTF() + " " + Double.isInfinite(tf));
+        if (Double.isInfinite(tf))
+            analysis.put("Transfer_Function", "Infinity");
+        else if (Double.isNaN(tf))
+            analysis.put("Transfer_Function", "NaN");
+        else
+            analysis.put("Transfer_Function", tf);
 
-        analysis.put("Transfer_Function", this.graphRep.getOverallTF());
-
+        System.out.println("Analysis: " + analysis.toString());
         return analysis.toString();
     }
 }
