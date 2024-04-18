@@ -105,7 +105,7 @@ export default {
       this.nodes=[];
       for (let i=0;i<numberOfNodes;i++){
         if(i==0) this.nodes[i]={name:"R(S)",color:"RGB(193,193,214)",fontColor:"black",receive:false}
-        else if(i==numberOfNodes-1) this.nodes[i]={name:"C(S)",color:"RGB(193,193,214)",fontColor:"black",from:false}
+        else if(i==numberOfNodes-1) this.nodes[i]={name:"C(S)",color:"RGB(193,193,214)",fontColor:"black",from:true}
         else this.nodes[i]={name:i,color:"RGB(64,70,103)",fontColor:"white"}
       }
       this.myDiagram.model = new go.GraphLinksModel(this.nodes);
@@ -172,7 +172,7 @@ export default {
         }
         this.individualloops.push(loop)
       }
-
+      analysis.Non_Touching_Loops.sort((a,b)=> a.length - b.length);
       let ntLoops = []
       let lastSize = 2;
       for(let i = 0 ;i < analysis.Non_Touching_Loops.length ;i++)
