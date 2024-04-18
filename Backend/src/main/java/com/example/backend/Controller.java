@@ -29,7 +29,7 @@ public class Controller {
     @PostMapping("/flowgraph")
     @ResponseBody
     public void signalFlowGraph(@RequestBody String graph) {
-        this.appService.signalFlowGraph(graph);
+        this.appService.constructGraph(graph);
     }
 
     @GetMapping("/flowgraph/analysis")

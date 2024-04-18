@@ -25,7 +25,7 @@ public class GraphRep {
         this.signalFlow = new SignalFlow();
     }
 
-    public void constructGraph(ArrayList<Node> graph) {
+    public void init(ArrayList<Node> graph) {
         this.signalFlow = new SignalFlow();
         this.graph = graph;
     }
@@ -41,8 +41,15 @@ public class GraphRep {
     }
 
     public ArrayList<ArrayList<Integer>> getIndividualLoops(){
+        Node dummy_Node=new Node(graph.size());
+        graph.get(graph.size()-1).adjacent.add(dummy_Node);
+        graph.get(graph.size()-1).gain.add(1.0);
+        graph.add(dummy_Node);
         loops=signalFlow.GetLoops(graph);
         loops=signalFlow.GetNonDoublicateLoops(loops,true);
+        graph.remove(graph.size()-1);
+        graph.get(graph.size()-1).adjacent.remove(graph.get(graph.size()-1).adjacent.size()-1);
+        graph.get(graph.size()-1).gain.remove(graph.get(graph.size()-1).gain.size()-1);
         return loops;
     }
 
@@ -57,23 +64,22 @@ public class GraphRep {
         return non_touched_loops;
     }
 
-    public ArrayList<ArrayList<Integer>> getLoopsForEachPath(){
+    public void getLoopsForEachPath(){
         for (ArrayList<Integer> forwardPath : forward_paths) {
             path_delta_gain.add((ArrayList<Integer>) signalFlow.getLoopsForPath(forwardPath, loops));
         }
-        return path_delta_gain;
     }
 
     public Double getDelta(){
         for(int i = 0 ;i<loops.size();i++){
             delta-= signalFlow.getLoop_gain().get(i);
         }
-        for(int  k =0;k<non_touched_loops.size();k++){
-            double temp_delta=Math.pow(-1, non_touched_loops.get(k).size());
-            for(Integer loop_index:non_touched_loops.get(k)){
-                temp_delta*= signalFlow.getLoop_gain().get(loop_index);
+        for (ArrayList<Integer> nonTouchedLoop : non_touched_loops) {
+            double temp_delta = Math.pow(-1, nonTouchedLoop.size());
+            for (Integer loop_index : nonTouchedLoop) {
+                temp_delta *= signalFlow.getLoop_gain().get(loop_index);
             }
-            delta+=temp_delta;
+            delta += temp_delta;
         }
         return delta;
     }
@@ -84,17 +90,17 @@ public class GraphRep {
             for(int j =0 ;j<path_delta_gain.get(i).size();j++){
                 path_loop_delta-= signalFlow.getLoop_gain().get(path_delta_gain.get(i).get(j));
             }
-            for(int  k =0;k<non_touched_loops.size();k++){
-                boolean non_touched_loop_path=true;
-                double temp_delta=Math.pow(-1, non_touched_loops.get(k).size());
-                for(Integer loop_index:non_touched_loops.get(k)){
-                    temp_delta*= signalFlow.getLoop_gain().get(loop_index);
-                    if(!path_delta_gain.get(i).contains(loop_index)){
-                        non_touched_loop_path=false;
+            for (ArrayList<Integer> nonTouchedLoop : non_touched_loops) {
+                boolean non_touched_loop_path = true;
+                double temp_delta = Math.pow(-1, nonTouchedLoop.size());
+                for (Integer loop_index : nonTouchedLoop) {
+                    temp_delta *= signalFlow.getLoop_gain().get(loop_index);
+                    if (!path_delta_gain.get(i).contains(loop_index)) {
+                        non_touched_loop_path = false;
                         break;
                     }
                 }
-                if(non_touched_loop_path)path_loop_delta+=temp_delta;
+                if (non_touched_loop_path) path_loop_delta += temp_delta;
             }
             path_delta.add(path_loop_delta);
         }

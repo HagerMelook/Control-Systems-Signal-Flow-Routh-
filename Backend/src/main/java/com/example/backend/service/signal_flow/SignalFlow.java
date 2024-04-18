@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SignalFlow {
-    private ArrayList<ArrayList<Integer>> ForwardPaths;
-    private ArrayList<Double> path_gain;
-    private ArrayList<ArrayList<Integer>> Loops;
-    private ArrayList<Double> loop_gain;
+    private final ArrayList<ArrayList<Integer>> ForwardPaths;
+    private final ArrayList<Double> path_gain;
+    private final ArrayList<ArrayList<Integer>> Loops;
+    private final ArrayList<Double> loop_gain;
     private ArrayList<Integer> non_touched;
     private final ArrayList<ArrayList<Integer>> AllCombination;
     private double temp;
@@ -22,52 +22,12 @@ public class SignalFlow {
         this.temp = 1.0;
     }
 
-    public ArrayList<ArrayList<Integer>> getForwardPaths() {
-        return ForwardPaths;
-    }
-
-    public void setForwardPaths(ArrayList<ArrayList<Integer>> forwardPaths) {
-        ForwardPaths = forwardPaths;
-    }
-
     public ArrayList<Double> getPath_gain() {
         return path_gain;
     }
 
-    public void setPath_gain(ArrayList<Double> path_gain) {
-        this.path_gain = path_gain;
-    }
-
-    public ArrayList<ArrayList<Integer>> getLoops() {
-        return Loops;
-    }
-
-    public void setLoops(ArrayList<ArrayList<Integer>> loops) {
-        Loops = loops;
-    }
-
     public ArrayList<Double> getLoop_gain() {
         return loop_gain;
-    }
-
-    public void setLoop_gain(ArrayList<Double> loop_gain) {
-        this.loop_gain = loop_gain;
-    }
-
-    public double getTemp() {
-        return temp;
-    }
-
-    public void setTemp(double temp) {
-        this.temp = temp;
-    }
-
-    public HashMap<Integer, Double> getTemp_gain() {
-        return temp_gain;
-    }
-
-    public void setTemp_gain(HashMap<Integer, Double> temp_gain) {
-        this.temp_gain = temp_gain;
     }
 
     // get forward paths and their gains
@@ -86,20 +46,20 @@ public class SignalFlow {
             return;
         }
         visited.add(start);
-        for(Node adj_node:start.adjacent){
-            if(!visited.contains(adj_node)){
-                path.add(adj_node.getId());
-                temp*=start.gain.get(start.adjacent.indexOf(adj_node));
-                GetForwardPath(path, visited,path_gain, adj_node,dest);
-                path.remove(path.indexOf(adj_node.getId()));
-                temp/=start.gain.get(start.adjacent.indexOf(adj_node));
+        for(int i =0;i<start.adjacent.size();i++){
+            if(!visited.contains(start.adjacent.get(i))){
+                path.add(start.adjacent.get(i).getId());
+                temp*=start.gain.get(i);
+                GetForwardPath(path, visited,path_gain, start.adjacent.get(i),dest);
+                path.remove(path.indexOf(start.adjacent.get(i).getId()));
+                temp/=start.gain.get(i);
             }
         }
         visited.remove(start);
     }
 
     // get loops and their gain
-    HashMap<Integer,Double>temp_gain=new HashMap<>();
+    private HashMap<Integer,Double>temp_gain=new HashMap<>();
     public ArrayList<ArrayList<Integer>> GetLoops(ArrayList<Node>graph){
         ArrayList<Integer> loop = new ArrayList<>();
         ArrayList<Node>visited=new ArrayList<>();
@@ -108,6 +68,7 @@ public class SignalFlow {
         GetLoop(loop,visited,loop_gain, graph.get(0), graph.get(graph.size() - 1));
         return Loops;
     }
+
     public void GetLoop(ArrayList<Integer>loop,ArrayList<Node>visited,ArrayList<Double>loop_gain,Node start,Node dest){
         if(start.getId()==dest.getId()){
             return;
@@ -145,17 +106,34 @@ public class SignalFlow {
         for(int i=0;i<loops.size();i++){
             for(int j=i+1;j<loops.size();j++){
                 int no_of_dublicate_node=0;
-                for(Integer node:loops.get(i)){
-                    if(loops.get(j).contains(node))
+                boolean dublicate = false;
+                for(int k=0;k<loops.get(i).size();k++){
+                    if(!loop_test &&loops.get(j).contains(loops.get(i).get(k)))
                         no_of_dublicate_node++;
+                    else if(loop_test &&loops.get(j).contains(loops.get(i).get(k))){
+                        dublicate=check_doublicte_of_loop(k,loops.get(i),loops.get(j));
+                        break;
+                    }
                 }
-                if(no_of_dublicate_node==loops.get(i).size()&&no_of_dublicate_node==loops.get(j).size()){
+                if((!loop_test &&no_of_dublicate_node==loops.get(i).size()&&no_of_dublicate_node==loops.get(j).size())||(loop_test && dublicate)){
                     loops.remove(j);
                     if(loop_test)loop_gain.remove(j);
                 }
             }
         }
         return loops;
+    }
+
+    public boolean check_doublicte_of_loop(int index,ArrayList<Integer>first_loop,ArrayList<Integer> sec_loop){
+        if((first_loop.size()!=sec_loop.size())||index!=0) return false;
+        int sec_index=sec_loop.indexOf(first_loop.get(index));
+        while(index<first_loop.size()-1){
+            if(first_loop.get(index)!=sec_loop.get(sec_index)) return false;
+            index++;
+            sec_index=(sec_index+1)%sec_loop.size();
+            if(sec_index==0)sec_index++;
+        }
+        return true;
     }
 
     // get all combinations of non_touching loops

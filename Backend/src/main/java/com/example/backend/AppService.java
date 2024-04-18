@@ -25,12 +25,12 @@ public class AppService {
         return routhHurwitz.systemInfo().toString();
     }
 
-    public void signalFlowGraph(String graphStr) {
-        JSONObject j = new JSONObject(graphStr);
-        System.out.println("graph : " + j.toString());
+    public void constructGraph(String graphStr) {
+//        System.out.println("graph : " + graphStr);
         this.graphRep = new GraphRep();
         ArrayList<Node> graph = new ArrayList<>();
         JSONObject graphJson = new JSONObject(graphStr);
+
         int nodes = graphJson.getInt("nodes");
 
         JSONArray fromJson = graphJson.getJSONArray("from");
@@ -47,7 +47,7 @@ public class AppService {
             double gain = gainsJson.getDouble(i++);
             graph.get((int) from).gain.add(gain);
         }
-        this.graphRep.constructGraph(graph);
+        this.graphRep.init(graph);
     }
 
     public String signalFlowGraphAnalysis() {
@@ -105,8 +105,8 @@ public class AppService {
         for (double delta : deltas)
             deltasJson.put(delta);
         analysis.put("Deltas", deltasJson);
+
         double tf = this.graphRep.getOverallTF();
-        System.out.println("TF: " + this.graphRep.getOverallTF() + " " + Double.isInfinite(tf));
         if (Double.isInfinite(tf))
             analysis.put("Transfer_Function", "Infinity");
         else if (Double.isNaN(tf))
